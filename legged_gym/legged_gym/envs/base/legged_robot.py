@@ -583,15 +583,17 @@ class LeggedRobot(BaseTask):
         # Load our Bank of Mocap data
         mocap_buffer = list()
         min_ = 1e6
-        for i in range(5):
-            path = f"/home/sacha/Documents/robotics_summer/fast_and_efficient/raw_data/full_states_{i}.npy"
-            data = np.load(path)
-            if data.shape[0] < min_:
-                min_ = data.shape[0]
-            mocap_buffer.append(torch.from_numpy(data).to(self.device))
+        for s in ['Forward_Left', 'Forward_Right', 'Forward', 'Left', 'Right']:
+            for i in range(5):
+                path = f"/home/sacha/Documents/robotics_summer/fast_and_efficient/raw_data/{s}_states_{i}.npy"
+                data = np.load(path)
+                if data.shape[0] < min_:
+                    min_ = data.shape[0]
+                mocap_buffer.append(torch.from_numpy(data).to(self.device))
 
         # Truncate everything to shortest trajectory
         for i, t in enumerate(mocap_buffer):
+            print(f'Truncating trajectories to {min_} steps...')
             mocap_buffer[i] = t[:min_]
         # This is now an (n_trajectories, trajectory_length, 19) tensor
         self.mocap_buffer = torch.stack(mocap_buffer).float()
@@ -998,7 +1000,7 @@ class LeggedRobot(BaseTask):
             mocap_loss
 
         """
-        delta_frame = 100
+        delta_frame = 10
         # 1) Compute distances to all entries in mocap_buffer
         # increase any index by 100 without issues
         # This should now be a (n_trajectories, n_steps, n_envs) tensor
