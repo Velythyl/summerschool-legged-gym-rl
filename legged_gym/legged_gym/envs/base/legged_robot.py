@@ -592,11 +592,12 @@ class LeggedRobot(BaseTask):
                 mocap_buffer.append(torch.from_numpy(data).to(self.device))
 
         # Truncate everything to shortest trajectory
+        print(f'Truncating trajectories to {min_} steps...')
         for i, t in enumerate(mocap_buffer):
-            print(f'Truncating trajectories to {min_} steps...')
             mocap_buffer[i] = t[:min_]
         # This is now an (n_trajectories, trajectory_length, 19) tensor
         self.mocap_buffer = torch.stack(mocap_buffer).float()
+        print(f'Mocap Tensor has shape {self.mocap_buffer.shape}...')
 
     def _prepare_reward_function(self):
         """ Prepares a list of reward functions, whcih will be called to compute the total reward.
