@@ -130,6 +130,7 @@ class LeggedRobot(BaseTask):
 
         self.last_actions[:] = self.actions[:]
         self.last_dof_vel[:] = self.dof_vel[:]
+        self.last_dof_pos[:] = self.dof_pos[:]
         self.last_root_vel[:] = self.root_states[:, 7:13]
 
         if self.viewer and self.enable_viewer_sync and self.debug_viz:
@@ -510,6 +511,7 @@ class LeggedRobot(BaseTask):
         self.actions = torch.zeros(self.num_envs, self.num_actions, dtype=torch.float, device=self.device, requires_grad=False)
         self.last_actions = torch.zeros(self.num_envs, self.num_actions, dtype=torch.float, device=self.device, requires_grad=False)
         self.last_dof_vel = torch.zeros_like(self.dof_vel)
+        self.last_dof_pos = torch.zeros_like(self.dof_pos)
         self.last_root_vel = torch.zeros_like(self.root_states[:, 7:13])
         self.commands = torch.zeros(self.num_envs, self.cfg.commands.num_commands, dtype=torch.float, device=self.device, requires_grad=False) # x vel, y vel, yaw vel, heading
         self.commands_scale = torch.tensor([self.obs_scales.lin_vel, self.obs_scales.lin_vel, self.obs_scales.ang_vel], device=self.device, requires_grad=False,) # TODO change this
@@ -906,5 +908,13 @@ class LeggedRobot(BaseTask):
         return torch.sum((torch.norm(self.contact_forces[:, self.feet_indices, :], dim=-1) -  self.cfg.rewards.max_contact_force).clip(min=0.), dim=1)
 
     def _reward_mocap(self):
-        # This is a template reward for testing
+        # 1) Compute Input (48 D)
+        import pdb; pdb.set_trace()
+
+        # 2) Compute Target (12 D)
+
+        # 3) Forward pass in actor
+
+        # 4) MSE
+
         return torch.linalg.norm(self.actions, dim=-1).mean()
