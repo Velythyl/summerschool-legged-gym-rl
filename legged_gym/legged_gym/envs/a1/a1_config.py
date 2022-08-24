@@ -74,7 +74,7 @@ class A1RoughCfg( LeggedRobotCfg ):
         class scales( LeggedRobotCfg.rewards.scales ):
             torques = -0.0002
             dof_pos_limits = -10.0
-            mocap = -100.0
+            mocap_pos = -1.0
 
 class A1FlatCfg(A1RoughCfg):
     class env( A1RoughCfg.env ):
