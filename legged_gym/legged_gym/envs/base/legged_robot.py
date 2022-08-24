@@ -581,9 +581,20 @@ class LeggedRobot(BaseTask):
         self.default_dof_pos = self.default_dof_pos.unsqueeze(0)
 
         # Load our Bank of Mocap data
-        self.mocap_path = "/home/sacha/Documents/robotics_summer/summerschool-legged-gym-rl/mocap_data/full_states.npy"
-        data = np.load(self.mocap_path)
-        self.mocap_buffer = torch.from_numpy(data).to(self.device)
+        mocap_buffer = list()
+        min_ = 1e6
+        for i in range(5):
+            path = f"/home/sacha/Documents/robotics_summer/fast_and_efficient/raw_data/full_states_{i}.npy"
+            data = np.load(path)
+            if data.shape[0] < min_:
+                min_ = data.shape[0]
+            mocap_buffer.append(torch.from_numpy(data).to(self.device))
+
+        # Truncate everything to shortest trajectory
+        for i, t in enumerate(mocap_buffer):
+            mocap_buffer[i] = t[:min_]
+        # This is now an (n_trajectories, trajectory_length, 19) tensor
+        self.mocap_buffer = torch.stack(mocap_buffer).float()
 
     def _prepare_reward_function(self):
         """ Prepares a list of reward functions, whcih will be called to compute the total reward.
@@ -987,30 +998,29 @@ class LeggedRobot(BaseTask):
             mocap_loss
 
         """
-        # 1) Find nearest neighbor in the mocap data based on last pos
-        distances = torch.cdist(prev, mocap_buffer)
-        input_id = torch.argmin(distances, dim=1)
+        delta_frame = 100
+        # 1) Compute distances to all entries in mocap_buffer
+        # increase any index by 100 without issues
+        # This should now be a (n_trajectories, n_steps, n_envs) tensor
+        distances = torch.cdist(prev, mocap_buffer[:, :-delta_frame, :])
 
-        # 2) Target is one frame ahead in the mocap buffer
-        # TODO : Check if 1 is enough, we may need to increase the delta+_frame
-        delta_frame = 1
-        target_id = input_id + delta_frame
+        # 2) Min in each trajectorie
+        min_r = torch.min(distances, dim=-1)
+        mins, min_ids = min_r.values, min_r.indices
 
-        # Make sure we don't go outside the buffer
-        mask = target_id < mocap_buffer.shape[0]
+        # 3) Find best trajectory for each observation
+        min_traj = mins.argmin(dim=0)
+        min_traj_step = min_ids[min_traj, torch.arange(min_ids.shape[1])]
+        min_traj_target = min_traj_step + delta_frame
 
-        # 3) Get observed pos and target pos
-        # TODO check if we need centering and rescaling
-        # e.g., (self.dof_pos - self.default_dof_pos) * self.obs_scales.dof_pos,
-        predicted_pos = current[mask]
-        target_pos = mocap_buffer[target_id[mask]]
+        # 4) Find target
+        target_pos = mocap_buffer[min_traj, min_traj_target]
 
-        # 4) Return pos
-        return torch.nn.functional.mse_loss(predicted_pos, target_pos)
+        return torch.nn.functional.mse_loss(current, target_pos)
 
     def _reward_mocap_pos(self):
         # Only use the last 12 features (joints)
-        r = self.compute_mocap_loss(prev=self.last_dof_pos.double(),
-                                    current=self.dof_pos,
-                                    mocap_buffer=self.mocap_buffer[:, -12:])
+        r = self.compute_mocap_loss(prev=self.last_dof_pos.float(),
+                                    current=self.dof_pos.float(),
+                                    mocap_buffer=self.mocap_buffer[:, :, -12:])
         return r

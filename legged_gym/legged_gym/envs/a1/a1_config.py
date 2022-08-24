@@ -74,7 +74,7 @@ class A1RoughCfg( LeggedRobotCfg ):
         class scales( LeggedRobotCfg.rewards.scales ):
             torques = -0.0002
             dof_pos_limits = -10.0
-            mocap_pos = -1.0
+            mocap_pos = -0.1
 
 class A1FlatCfg(A1RoughCfg):
     class env( A1RoughCfg.env ):
@@ -94,6 +94,6 @@ class A1RoughCfgPPO( LeggedRobotCfgPPO ):
 class A1FlatCfgPPO( A1RoughCfgPPO ):
     class runner( A1RoughCfgPPO.runner ):
         experiment_name = 'flat_a1'
-        max_iterations = 500
+        max_iterations = 1000
 
   
