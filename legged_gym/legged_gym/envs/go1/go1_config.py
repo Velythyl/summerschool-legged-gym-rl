@@ -96,7 +96,7 @@ class Go1MrssNovel(Go1FlatNoVelCfg):
         heading_command = False
 
     class rewards(Go1FlatCfg.rewards):
-        only_positive_rewards = False
+        only_positive_rewards = True
         class scales(Go1FlatCfg.rewards.scales):
             orientation = -0.5
             feet_air_time = 0.5
