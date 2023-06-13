@@ -213,6 +213,11 @@ class LeggedRobot(BaseTask):
     def compute_observations(self):
         """Computes observations"""
         obs = []
+        privileged_obs = []
+        privileged_obs += [
+            self.base_lin_vel * self.obs_scales.lin_vel,
+            self.base_ang_vel * self.obs_scales.ang_vel,
+        ]
         if self.cfg.env.observe_vel:
             obs += [
                 self.base_lin_vel * self.obs_scales.lin_vel,
@@ -220,6 +225,13 @@ class LeggedRobot(BaseTask):
             ]
 
         obs += [
+            self.projected_gravity,
+            self.commands[:, :3] * self.commands_scale,
+            (self.dof_pos - self.default_dof_pos) * self.obs_scales.dof_pos,
+            self.dof_vel * self.obs_scales.dof_vel,
+            self.actions,
+        ]
+        privileged_obs += [
             self.projected_gravity,
             self.commands[:, :3] * self.commands_scale,
             (self.dof_pos - self.default_dof_pos) * self.obs_scales.dof_pos,
@@ -236,6 +248,7 @@ class LeggedRobot(BaseTask):
             obs += heights
 
         self.obs_buf = torch.cat(obs, dim=-1)
+        self.privileged_obs_buf = torch.cat(privileged_obs, dim=-1)
         # add noise if needed
         if self.add_noise:
             self.obs_buf += (2 * torch.rand_like(self.obs_buf) - 1) * self.noise_scale_vec

@@ -88,6 +88,7 @@ class Go1FlatCfg(Go1RoughCfg):
 class Go1FlatNoVelCfg(Go1FlatCfg):
     class env(Go1FlatCfg.env):
         num_observations = 42  # nice
+        num_privileged_obs = 48
         observe_vel = False
 
 class Go1MrssNovel(Go1FlatNoVelCfg):
@@ -104,9 +105,9 @@ class Go1MrssNovel(Go1FlatNoVelCfg):
         push_robots = True
         randomize_friction = True
         randomize_base_mass = True
-        push_interval_s = 3
-        max_push_vel_xy = 5.0
-        friction_range = [0.1, 10.0]
+        push_interval_s = 15.0
+        max_push_vel_xy = 1.0
+        friction_range = [0.1, 3.0]
         added_mass_range = [-2, 2]
 
     class noise(LeggedRobotCfg.noise):
@@ -142,4 +143,4 @@ class Go1FlatCfgPPO(LeggedRobotCfgPPO):
 class Go1FlatNoVelCfgPPO(Go1FlatCfgPPO):
     class runner(Go1FlatCfgPPO.runner):
         experiment_name = "flat_go1_novel"
-        max_iterations = 1500
+        max_iterations = 3000
