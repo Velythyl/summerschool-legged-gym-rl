@@ -90,6 +90,35 @@ class Go1FlatNoVelCfg(Go1FlatCfg):
         num_observations = 42  # nice
         observe_vel = False
 
+class Go1MrssNovel(Go1FlatNoVelCfg):
+    class commands(Go1FlatCfg.commands):
+        heading_command = False
+
+    class rewards(Go1FlatCfg.rewards):
+        only_positive_rewards = False
+        class scales(Go1FlatCfg.rewards.scales):
+            orientation = -0.5
+            feet_air_time = 0.5
+            
+    class domain_rand(Go1FlatCfg.domain_rand):
+        push_robots = True
+        randomize_friction = True
+        randomize_base_mass = True
+        push_interval_s = 3
+        max_push_vel_xy = 5.0
+        friction_range = [0.1, 10.0]
+        added_mass_range = [-2, 2]
+
+    class noise(LeggedRobotCfg.noise):
+        noise_level = 1.5
+        class noise_scales(LeggedRobotCfg.noise.noise_scales):
+            dof_pos = 0.1
+            dof_vel = 2.0
+            lin_vel = 0.15
+            ang_vel = 0.25
+            gravity = 0.05
+            height_measurements = 0.1
+
 
 class Go1RoughCfgPPO(LeggedRobotCfgPPO):
     class algorithm(LeggedRobotCfgPPO.algorithm):

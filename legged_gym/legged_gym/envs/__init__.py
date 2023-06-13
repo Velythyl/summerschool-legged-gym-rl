@@ -37,7 +37,7 @@ from .anymal_b.anymal_b_config import AnymalBRoughCfg, AnymalBRoughCfgPPO
 from .cassie.cassie import Cassie
 from .cassie.cassie_config import CassieRoughCfg, CassieRoughCfgPPO
 from .a1.a1_config import A1RoughCfg, A1RoughCfgPPO, A1FlatCfg, A1FlatCfgPPO
-from .go1.go1_config import Go1RoughCfg, Go1RoughCfgPPO, Go1FlatCfg, Go1FlatCfgPPO, Go1FlatNoVelCfg, Go1FlatNoVelCfgPPO
+from .go1.go1_config import Go1RoughCfg, Go1RoughCfgPPO, Go1FlatCfg, Go1MrssNovel, Go1FlatCfgPPO, Go1FlatNoVelCfg, Go1FlatNoVelCfgPPO
 
 from legged_gym.utils.task_registry import task_registry
 
@@ -50,4 +50,6 @@ task_registry.register("a1_flat_novel", LeggedRobot, A1FlatNoVelCfg(), A1FlatNoV
 task_registry.register("go1_rough", LeggedRobot, Go1RoughCfg(), Go1RoughCfgPPO())
 task_registry.register("go1_flat", LeggedRobot, Go1FlatCfg(), Go1FlatCfgPPO())
 task_registry.register("go1_flat_novel", LeggedRobot, Go1FlatNoVelCfg(), Go1FlatNoVelCfgPPO())
+task_registry.register("go1_flat_novel", LeggedRobot, Go1FlatNoVelCfg(), Go1FlatNoVelCfgPPO())
+task_registry.register("go1_mrss_novel", LeggedRobot, Go1MrssNovel(), Go1FlatNoVelCfgPPO())
 task_registry.register("cassie", Cassie, CassieRoughCfg(), CassieRoughCfgPPO())
