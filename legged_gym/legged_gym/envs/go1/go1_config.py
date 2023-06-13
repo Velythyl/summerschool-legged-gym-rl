@@ -120,6 +120,17 @@ class Go1MrssNovel(Go1FlatNoVelCfg):
             gravity = 0.05
             height_measurements = 0.1
 
+class Go1MrssNovelRough(Go1MrssNovel):
+    class terrain(Go1MrssNovel.terrain):
+        mesh_type = 'trimesh' # "heightfield" # none, plane, heightfield or trimesh
+        horizontal_scale = 0.1 # [m]
+        vertical_scale = 0.005 # [m]
+        num_cols = 4
+        num_rows = 4
+        border_size = 25 # [m]
+        curriculum = False
+        # terrain types: [smooth slope, rough slope, stairs up, stairs down, discrete, flat]
+        terrain_proportions = [0.25, 0.25, 0.0, 0.0, 0.25, 0.25]
 
 class Go1RoughCfgPPO(LeggedRobotCfgPPO):
     class algorithm(LeggedRobotCfgPPO.algorithm):
