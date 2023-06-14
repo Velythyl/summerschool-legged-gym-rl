@@ -99,7 +99,7 @@ class Go1MrssNovel(Go1FlatNoVelCfg):
         only_positive_rewards = True
         class scales(Go1FlatCfg.rewards.scales):
             orientation = -0.5
-            feet_air_time = 0.5
+            feet_air_time = 0.8
             
     class domain_rand(Go1FlatCfg.domain_rand):
         push_robots = True
